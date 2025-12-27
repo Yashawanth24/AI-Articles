@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="<%= article.summary.slice(0, 150) %>">
+  <title><%= article.title %></title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Tech News Hub</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/category/smartphones">Smartphones</a>
+      <a href="/category/wearables">Wearables</a>
+    </nav>
+  </header>
+  <main>
+    <h2><%= article.title %></h2>
+    <p><%= article.summary %></p>
+    <p><strong><a href="<%= article.url %>" target="_blank">Read Original Source</a></strong></p>
+  </main>
+</body>
+</html>

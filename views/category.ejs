@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Category: <%= categoryName %>">
+  <title><%= categoryName %> Articles - Tech News Hub</title>
+</head>
+<body>
+  <header>
+    <h1>Category: <%= categoryName %></h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/category/smartphones">Smartphones</a>
+      <a href="/category/wearables">Wearables</a>
+    </nav>
+  </header>
+  <main>
+    <ul>
+      <% articles.forEach(article => { %>
+        <li>
+          <a href="/article/<%= article.id %>"><%= article.title %></a>
+          <p><%= article.summary.slice(0, 150) %>...</p>
+        </li>
+      <% }); %>
+    </ul>
+  </main>
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> Tech News Hub</p>
+  </footer>
+</body>
+</html>
