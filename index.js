@@ -6,6 +6,7 @@ const fetchAndValidateRSS = require("./services/rssFetcher");
 const sitemapRoutes = require("./routes/sitemap");
 const sequelize = require("./config/config");
 const app = express();
+const { Op } = require("sequelize");
 
 // Middleware
 app.use(express.static(path.join(__dirname, "public")));
@@ -25,7 +26,18 @@ app.get("/", async (req, res) => {
 app.get("/article/:id", async (req, res) => {
   const article = await Article.findByPk(req.params.id);
   if (!article) return res.status(404).send("Article not found");
-  res.render("article", { article, title: article.title, description: article.summary.slice(0, 150) });
+
+  // Fetch 3 related articles from the same category
+  const relatedArticles = await Article.findAll({
+    where: {
+      category: article.category,
+      id: { [Op.ne]: article.id } // Exclude the current article
+    },
+    limit: 3,
+    order: sequelize.random() // Randomize for variety
+  });
+
+  res.render("article", { article, relatedArticles });
 });
 
 // Sitemap for SEO
@@ -33,9 +45,10 @@ app.use("/sitemap.xml", sitemapRoutes);
 
 // Schedule RSS Fetch and Validation
 const cron = require("node-cron");
+// Inside index.js
 cron.schedule("0 */6 * * *", async () => {
-  console.log("[CronJob] Fetching and Validating RSS Feeds...");
-  await fetchAndValidateRSS("https://www.techradar.com/rss", "tech-news");
+  console.log("[CronJob] Synthesizing New AI Blogs...");
+  await fetchAndValidateRSS(); // No arguments needed now
 });
 
 
