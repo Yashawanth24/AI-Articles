@@ -1,6 +1,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const { decode } = require("html-entities");
+const scrapeWebsite = require("./scraper");
 
 async function fetchArticleText(url) {
   try {
@@ -37,6 +38,16 @@ function simpleSummarize(text, maxSentences = 3) {
 
 const validateAndSummarize = async (articleUrl, articleTitle) => {
   console.log(`[VALIDATE] Processing: ${articleTitle} (${articleUrl})`);
+
+  const scrapedData = await scrapeWebsite(articleUrl);
+  
+  if (scrapedData.isValid) {
+    return {
+      summary: scrapedData.summary,
+      image: scrapedData.image, // Return the image found by scraper
+      isValid: true
+    };
+  }
 
   // Try external summarizer if configured
   if (process.env.GEMINI_API_URL && process.env.GEMINI_API_KEY) {

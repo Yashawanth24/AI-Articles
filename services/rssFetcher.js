@@ -1,53 +1,27 @@
-const axios = require("axios");
-const { parseStringPromise } = require("xml2js");
 const Article = require("../models/Article");
-const { validateAndSummarize } = require("./summarizer");
+const { fetchAndSynthesizeNews } = require("./newsService");
 
-const rssFeeds = [
-  { url: "https://www.techradar.com/rss", category: "tech" },
-  { url: "https://www.cnet.com/rss/all/", category: "tech" },
-  { url: "https://www.theverge.com/rss/index.xml", category: "tech" },
-  { url: "https://www.wired.com/feed/rss", category: "tech" },
-  { url: "http://feeds.arstechnica.com/arstechnica/technology-lab", category: "tech" },
-  { url: "https://www.engadget.com/rss.xml", category: "tech" },
-];
+const updateBlogDatabase = async () => {
+  console.log("🚀 Starting Legal News Synthesis...");
+  
+  // We target specific niches to look professional for AdSense
+  const techNews = await fetchAndSynthesizeNews("AI gadgets software");
 
-const fetchAndValidateRSS = async () => {
-  console.log(`[RSS FETCHER] Starting RSS Fetch...`);
-
-  for (const feed of rssFeeds) {
-    console.log(`[FETCHING] RSS Feed: ${feed.url}`);
-    try {
-      // Step 1: Fetch and parse feed
-      const { data: rssData } = await axios.get(feed.url);
-      const parsed = await parseStringPromise(rssData);
-
-      const items = parsed.rss.channel[0].item;
-      for (const item of items) {
-        const title = item.title[0];
-        const url = item.link[0];
-        const publishedAt = new Date(item.pubDate[0]);
-
-        // Check for duplicate articles
-        const existingArticle = await Article.findOne({ where: { url } });
-        if (existingArticle) {
-          console.log(`[SKIP] Article already exists: ${title}`);
-          continue;
-        }
-
-        // Summarize and save
-        const { summary, isValid } = await validateAndSummarize(url, title);
-        if (!isValid) continue; // Skip invalid articles
-
-        await Article.create({ title, url, category: feed.category, summary, publishedAt });
-        console.log(`[SUCCESS] Saved article: ${title}`);
-      }
-    } catch (error) {
-      console.error(`[ERROR] Failed to process feed ${feed.url}:`, error.message);
+  for (const blog of techNews) {
+    const existing = await Article.findOne({ where: { url: blog.url } });
+    if (!existing) {
+      await Article.create({
+        title: blog.displayTitle, // Use the AI's unique title
+        url: blog.url,
+        summary: blog.content.substring(0, 200) + "...",
+        content: blog.content, // Full AI-written blog
+        image: blog.image,
+        category: "Tech",
+        publishedAt: blog.publishedAt
+      });
+      console.log(`✅ Published Original Blog: ${blog.displayTitle}`);
     }
   }
-
-  console.log(`[RSS FETCHER] RSS Fetch Complete.`);
 };
 
-module.exports = fetchAndValidateRSS;
+module.exports = updateBlogDatabase;

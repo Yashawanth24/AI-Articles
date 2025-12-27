@@ -16,10 +16,29 @@
       <a href="/category/wearables">Wearables</a>
     </nav>
   </header>
-  <main>
-    <h2><%= article.title %></h2>
-    <p><%= article.summary %></p>
-    <p><strong><a href="<%= article.url %>" target="_blank">Read Original Source</a></strong></p>
-  </main>
+ <main class="article-container">
+    <nav class="breadcrumb">
+        <a href="/">Home</a> / <span><%= article.category %></span>
+    </nav>
+
+    <header class="article-header">
+        <h1><%= article.title %></h1>
+        <p class="meta">Published on <%= new Date(article.publishedAt).toDateString() %> | AI Analysis</p>
+    </header>
+
+    <% if (article.image) { %>
+        <img src="<%= article.image %>" class="featured-image">
+    <% } %>
+
+    <div class="article-body">
+        <%- article.content.replace(/\n/g, '<br>') %>
+    </div>
+
+    <footer class="article-footer">
+        <p>This article was synthesized by AI based on reporting from: 
+           <a href="<%= article.url %>" target="_blank"><%= article.source || 'Original Source' %></a>
+        </p>
+    </footer>
+</main>
 </body>
 </html>

@@ -16,19 +16,30 @@
       <a href="/category/wearables">Wearables</a>
     </nav>
   </header>
-  <main>
- <ul>
-  <% articles.forEach(article => { %>
-    <li>
-      <% if (article.image) { %>
-        <img src="<%= article.image %>" alt="<%= article.title %>" style="max-width: 100%; height: auto;">
-      <% } %>
-      <h2><a href="/article/<%= article.id %>"><%= article.title %></a></h2>
-      <p><%= article.summary.slice(0, 150) %>...</p>
-      <a href="<%= article.url %>" target="_blank" class="read-more">Read Original Source</a>
-    </li>
-  <% }); %>
-</ul>
-  </main>
+  <main class="container">
+    <h1 class="main-title">Latest in Tech & AI</h1>
+    <div class="article-grid">
+        <% articles.forEach(article => { %>
+            <article class="article-card">
+                <div class="card-image">
+                    <% if (article.image) { %>
+                        <img src="<%= article.image %>" alt="<%= article.title %>">
+                    <% } else { %>
+                        <div class="placeholder-img">Tech News</div>
+                    <% } %>
+                    <span class="category-tag"><%= article.category %></span>
+                </div>
+                <div class="card-content">
+                    <h2><%= article.title %></h2>
+                    <p><%= article.summary.substring(0, 120) %>...</p>
+                    <div class="card-footer">
+                        <span class="date"><%= new Date(article.publishedAt).toLocaleDateString() %></span>
+                        <a href="/article/<%= article.id %>" class="read-btn">Read AI Analysis &rarr;</a>
+                    </div>
+                </div>
+            </article>
+        <% }) %>
+    </div>
+</main>
 </body>
 </html>
